@@ -1,17 +1,9 @@
-// import React from "react";
 import { useState } from "react";
 import appConfig from "../config.json";
-import {
-  Box,
-  Button,
-  Text,
-  TextField,
-  Image as Imag,
-} from "@skynexui/components";
+import { Box, Button, Text, TextField, Image } from "@skynexui/components";
 import Head from "next/head";
 import { useRouter } from "next/router";
 
-import Image from "next/image";
 function Title({ title, tag }) {
   const Tag = tag;
   return (
@@ -31,8 +23,6 @@ function Title({ title, tag }) {
 }
 
 export default function PaginaInicial() {
-  // const [ImagSrc, setImagSrc] = useState(`https://github.com/${username}.png`);
-
   const [username, setUsername] = useState("adriel45dev");
   const roteamento = useRouter();
 
@@ -44,7 +34,7 @@ export default function PaginaInicial() {
   return (
     <>
       <Head>
-        <title>👽 Spacecord - Zero G </title>
+        <title>Spacecord - Zero G </title>
         <meta charSet="utf-8" />
         <meta name="viewport" content="initial-scale=1.0, width=device-width" />
         <link rel="shortcut icon" href="/favicon.ico" />
@@ -56,8 +46,7 @@ export default function PaginaInicial() {
           alignItems: "center",
           justifyContent: "center",
           backgroundColor: appConfig.theme.colors.primary[500],
-          backgroundImage:
-            "url(https://images.unsplash.com/photo-1559657693-e816ff3bd9af?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=871&q=80)",
+          backgroundImage: "url(/images/back-space.jpg)",
           backgroundRepeat: "no-repeat",
           backgroundSize: "cover",
           backgroundBlendMode: "multiply",
@@ -98,7 +87,7 @@ export default function PaginaInicial() {
               marginBottom: "32px",
             }}
           >
-            <Imag
+            <Image
               src={"images/rocket-launch.svg"}
               styleSheet={{
                 width: "96px",
@@ -163,12 +152,16 @@ export default function PaginaInicial() {
               minHeight: "240px",
             }}
           >
-            <Imag
+            <Image
+              src={`https://github.com/${username}.png`}
+              onError={({ currentTarget }) => {
+                currentTarget.onerror = null;
+                currentTarget.src = "/images/telescope.png";
+              }}
               styleSheet={{
                 borderRadius: "50%",
                 marginBottom: "16px",
               }}
-              src={`https://github.com/${username}.png`}
             />
             <Text
               variant="body4"
