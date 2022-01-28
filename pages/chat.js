@@ -4,6 +4,8 @@ import React from "react";
 import { useState } from "react";
 import appConfig from "../config.json";
 import { createClient } from "@supabase/supabase-js";
+import { useRouter } from "next/router";
+import { ButtonSendSticker } from "../src/components/ButtonSendSticker";
 
 const SUPABASE_ANON_KEY =
   "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJyb2xlIjoiYW5vbiIsImlhdCI6MTY0MzI5NzE0NiwiZXhwIjoxOTU4ODczMTQ2fQ.XQMrl5Fx8l60jBRU-An31obkBwd5f6k9ZqCgL4tK9Rw";
@@ -11,9 +13,27 @@ const SUPABASE_ANON_KEY =
 const SUPABASE_URL = "https://uwppifzshjofflpalzwb.supabase.co";
 const supabaseCliente = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
+function listeningRealTimeMessage(adicionaMensagem) {
+  return supabaseCliente
+    .from("mensagens")
+    .on("INSERT", (respostaLive) => {
+      adicionaMensagem(respostaLive.new);
+    })
+    .subscribe();
+}
+
 export default function ChatPage() {
+  const roteamento = useRouter();
+  const loggedUser = roteamento.query.username;
   const [mensagem, setMensagem] = useState("");
-  const [listaDeMensagens, setListaDeMensagens] = useState([]);
+  const [listaDeMensagens, setListaDeMensagens] = useState([
+    // {
+    //   id: 1,
+    //   de: "adriel45dev",
+    //   texto:
+    //     ":sticker: https://www.alura.com.br/imersao-react-4/assets/figurinhas/Figurinha_3.png",
+    // },
+  ]);
 
   React.useEffect(() => {
     supabaseCliente
@@ -21,28 +41,33 @@ export default function ChatPage() {
       .select("*")
       .order("id", { ascending: false })
       .then(({ data }) => {
-        console.log(data);
         setListaDeMensagens(data);
       });
+
+    listeningRealTimeMessage(
+      (novaMensagem) => {
+        setListaDeMensagens((valorAtualDaLista) => {
+          return [novaMensagem, ...valorAtualDaLista];
+        });
+      }
+      // handleNovaMensagem(novaMensagem)
+    );
   }, []);
 
   const handleNovaMensagem = (novaMensagem) => {
     const mensagem = {
       texto: novaMensagem,
-      de: "adriel45dev",
+      de: loggedUser,
     };
     supabaseCliente
       .from("mensagens")
       .insert([mensagem])
-      .then(({ data }) => {
-        setListaDeMensagens([data[0], ...listaDeMensagens]);
-      });
+      .then(({ data }) => {});
 
     setMensagem("");
   };
 
   const handleDeleteMensagem = (id) => {
-    console.log(id);
     const newData = listaDeMensagens.filter((message) => message.id !== id);
 
     supabaseCliente
@@ -132,31 +157,55 @@ export default function ChatPage() {
                 color: appConfig.theme.colors.neutrals[200],
               }}
             />
-            <Button
-              onClick={(e) => {
-                e.preventDefault();
-                handleNovaMensagem(mensagem);
-              }}
-              type="submit"
-              label=""
-              fullWidth
-              buttonColors={{
-                contrastColor: appConfig.theme.colors.neutrals["000"],
-                mainColor: appConfig.theme.colors.primary[500],
-                mainColorLight: appConfig.theme.colors.primary[400],
-                mainColorStrong: appConfig.theme.colors.primary[600],
-              }}
-              styleSheet={{
-                width: "36px",
-                height: "36px",
-                borderRadius: "50%",
-                resize: "none",
-                backgroundImage: "URL(/images/send.svg)",
-                backgroundSize: "80%",
-                backgroundRepeat: "no-repeat",
-                backgroundPosition: "center",
+            <ButtonSendSticker
+              onStickerClick={(sticker) => {
+                handleNovaMensagem(`:sticker:${sticker}`);
               }}
             />
+            <Box>
+              <Button
+                onClick={(e) => {
+                  e.preventDefault();
+                  handleNovaMensagem(mensagem);
+                }}
+                type="submit"
+                label="✔"
+                fullWidth
+                buttonColors={{
+                  contrastColor: appConfig.theme.colors.neutrals["000"],
+                  mainColor: appConfig.theme.colors.primary[500],
+                  mainColorLight: appConfig.theme.colors.primary[800],
+                  mainColorStrong: appConfig.theme.colors.primary[600],
+                }}
+                styleSheet={{
+                  borderRadius: "50%",
+                  padding: "0 3px 0 0",
+                  minWidth: "50px",
+                  minHeight: "50px",
+                  fontSize: "20px",
+                  marginBottom: "8px",
+                  lineHeight: "0",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  backgroundColor: appConfig.theme.colors.primary[800],
+
+                  hover: {
+                    filter: "grayscale(0)",
+                  },
+                }}
+                // styleSheet={{
+                //   width: "36px",
+                //   height: "36px",
+                //   borderRadius: "50%",
+                //   resize: "none",
+                //   backgroundImage: "URL(/images/send.svg)",
+                //   backgroundSize: "80%",
+                //   backgroundRepeat: "no-repeat",
+                //   backgroundPosition: "center",
+                // }}
+              />
+            </Box>
           </Box>
         </Box>
       </Box>
@@ -194,7 +243,6 @@ function MessageList({ mensagens, handleDeleteMensagem }) {
       tag="ul"
       styleSheet={{
         overflow: "scroll;",
-        overflowX: "hidden",
         display: "flex",
         flexDirection: "column-reverse",
         flex: 1,
@@ -204,73 +252,72 @@ function MessageList({ mensagens, handleDeleteMensagem }) {
     >
       {mensagens.map((mensagem) => {
         return (
-          <Box
+          <Text
             key={mensagem.id}
+            tag="li"
             styleSheet={{
-              display: "flex",
-              alignItems: "center",
-              alignContent: "center",
-              justifyContent: "space-between",
+              width: "100%",
+              borderRadius: "5px",
+              padding: "6px",
+              marginBottom: "12px",
+              hover: {
+                backgroundColor: appConfig.theme.colors.neutrals[700],
+              },
             }}
           >
-            <Text
-              key={mensagem.id}
-              tag="li"
+            <Box
               styleSheet={{
-                width: "100%",
-                borderRadius: "5px",
-                padding: "6px",
-                marginBottom: "12px",
-                hover: {
-                  backgroundColor: appConfig.theme.colors.neutrals[700],
-                },
+                marginBottom: "8px",
               }}
             >
-              <Box
+              <Image
                 styleSheet={{
-                  marginBottom: "8px",
+                  width: "20px",
+                  height: "20px",
+                  borderRadius: "50%",
+                  display: "inline-block",
+                  marginRight: "8px",
                 }}
+                src={`https://github.com/${mensagem.de}.png`}
+              />
+              <Text tag="strong">{mensagem.de}</Text>
+              <Text
+                styleSheet={{
+                  fontSize: "10px",
+                  marginLeft: "8px",
+                  color: appConfig.theme.colors.neutrals[300],
+                }}
+                tag="span"
               >
-                <Image
-                  styleSheet={{
-                    width: "20px",
-                    height: "20px",
-                    borderRadius: "50%",
-                    display: "inline-block",
-                    marginRight: "8px",
-                  }}
-                  src={`https://github.com/${mensagem.de}.png`}
-                />
-                <Text tag="strong">{mensagem.de}</Text>
-                <Text
-                  styleSheet={{
-                    fontSize: "10px",
-                    marginLeft: "8px",
-                    color: appConfig.theme.colors.neutrals[300],
-                  }}
-                  tag="span"
-                >
-                  {new Date().toLocaleDateString()}
-                </Text>
-              </Box>
-              {mensagem.texto}
-            </Text>
-            {/* btn delete */}
+                {new Date().toLocaleDateString()}
+              </Text>
+              <Button
+                onClick={() => {
+                  handleDeleteMensagem(mensagem.id);
+                }}
+                iconName="FaTrashAlt"
+                style={{ width: "18px", height: "18px" }}
+                styleSheet={{
+                  marginLeft: "8px",
+                }}
+                buttonColors={{
+                  contrastColor: "#FFFFFF",
+                  mainColor: "#e03131",
+                  mainColorLight: "#fa5252",
+                  mainColorStrong: "#c92a2a",
+                }}
+              />
+            </Box>
 
-            <Button
-              onClick={() => {
-                handleDeleteMensagem(mensagem.id);
-              }}
-              iconName="FaTrashAlt"
-              style={{ width: "18px", height: "18px", alignSelf: "auto" }}
-              buttonColors={{
-                contrastColor: "#FFFFFF",
-                mainColor: "#e03131",
-                mainColorLight: "#fa5252",
-                mainColorStrong: "#c92a2a",
-              }}
-            />
-          </Box>
+            {mensagem.texto.startsWith(":sticker:") ? (
+              <Image
+                src={mensagem.texto.replace(":sticker:", "")}
+                styleSheet={{ width: "128px" }}
+              />
+            ) : (
+              mensagem.texto
+            )}
+          </Text>
         );
       })}
     </Box>
