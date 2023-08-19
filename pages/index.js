@@ -52,11 +52,13 @@ export default function PaginaInicial() {
           backgroundBlendMode: "multiply",
         }}
       >
+        {/* Card */}
         <Box
           styleSheet={{
             display: "flex",
             alignItems: "center",
             justifyContent: "space-between",
+
             flexDirection: {
               xs: "column",
               sm: "row",
@@ -89,9 +91,13 @@ export default function PaginaInicial() {
           >
             <Image
               src={"images/rocket-launch.svg"}
+              width={96}
+              height={96}
+              alt="Rocket Logo"
               styleSheet={{
-                width: "96px",
-                marginBottom: "16px",
+                hover: {
+                  transform: "scale(1.2)",
+                },
               }}
             />
 
@@ -144,6 +150,10 @@ export default function PaginaInicial() {
               alignItems: "center",
               maxWidth: "200px",
               padding: "16px",
+              marginLeft: {
+                xs: "0px",
+                sm: "16px",
+              },
               backgroundColor: appConfig.theme.colors.neutrals[800],
               border: "1px solid",
               borderColor: appConfig.theme.colors.neutrals[999],
@@ -158,6 +168,7 @@ export default function PaginaInicial() {
                 currentTarget.onerror = null;
                 currentTarget.src = "/images/telescope.png";
               }}
+              alt="Profile Image"
               styleSheet={{
                 borderRadius: "50%",
                 marginBottom: "16px",

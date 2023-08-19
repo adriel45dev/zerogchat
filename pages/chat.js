@@ -1,5 +1,4 @@
 import { Box, Text, TextField, Image, Button } from "@skynexui/components";
-import { deburr } from "lodash";
 import React from "react";
 import { useState } from "react";
 import appConfig from "../config.json";
@@ -26,14 +25,7 @@ export default function ChatPage() {
   const roteamento = useRouter();
   const loggedUser = roteamento.query.username;
   const [mensagem, setMensagem] = useState("");
-  const [listaDeMensagens, setListaDeMensagens] = useState([
-    // {
-    //   id: 1,
-    //   de: "adriel45dev",
-    //   texto:
-    //     ":sticker: https://www.alura.com.br/imersao-react-4/assets/figurinhas/Figurinha_3.png",
-    // },
-  ]);
+  const [listaDeMensagens, setListaDeMensagens] = useState([]);
 
   React.useEffect(() => {
     supabaseCliente
@@ -94,6 +86,7 @@ export default function ChatPage() {
         color: appConfig.theme.colors.neutrals["000"],
       }}
     >
+      {/* Chat */};
       <Box
         styleSheet={{
           display: "flex",
@@ -241,6 +234,7 @@ function MessageList({ mensagens, handleDeleteMensagem }) {
   return (
     <Box
       tag="ul"
+      className="chat"
       styleSheet={{
         overflow: "scroll;",
         display: "flex",
@@ -248,6 +242,7 @@ function MessageList({ mensagens, handleDeleteMensagem }) {
         flex: 1,
         color: appConfig.theme.colors.neutrals["000"],
         marginBottom: "16px",
+        overflowX: "hidden",
       }}
     >
       {mensagens.map((mensagem) => {
@@ -279,6 +274,7 @@ function MessageList({ mensagens, handleDeleteMensagem }) {
                   marginRight: "8px",
                 }}
                 src={`https://github.com/${mensagem.de}.png`}
+                alt={mensagem.de}
               />
               <Text tag="strong">{mensagem.de}</Text>
               <Text
@@ -313,6 +309,7 @@ function MessageList({ mensagens, handleDeleteMensagem }) {
               <Image
                 src={mensagem.texto.replace(":sticker:", "")}
                 styleSheet={{ width: "128px" }}
+                alt={"sticker"}
               />
             ) : (
               mensagem.texto

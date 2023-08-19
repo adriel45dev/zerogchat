@@ -1,6 +1,18 @@
 function GlobalStyle() {
   return (
     <style global jsx>{`
+      ::-webkit-scrollbar {
+        width: 20px;
+      }
+      ::-webkit-scrollbar-track {
+        box-shadow: inset 0 0 5px grey;
+        border-radius: 10px;
+      }
+      ::-webkit-scrollbar-thumb {
+        background: #0c8599;
+        border-radius: 10px;
+      }
+
       * {
         margin: 0;
         padding: 0;
